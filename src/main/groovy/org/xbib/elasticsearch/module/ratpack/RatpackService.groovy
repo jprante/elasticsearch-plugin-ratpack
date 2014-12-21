@@ -21,12 +21,10 @@ import org.elasticsearch.client.Client
 import org.elasticsearch.common.component.AbstractComponent
 import org.elasticsearch.common.inject.Inject
 import org.elasticsearch.common.settings.Settings
-import ratpack.launch.LaunchConfig
-import ratpack.launch.LaunchConfigBuilder
-import ratpack.server.RatpackServerBuilder
+import ratpack.embed.BaseDirBuilder
+import ratpack.embed.GroovyEmbeddedApp
+import ratpack.jackson.JacksonModule
 import groovy.util.logging.Slf4j
-
-import static ratpack.groovy.Groovy.chain
 
 @Slf4j
 class RatpackService extends AbstractComponent {
@@ -34,17 +32,33 @@ class RatpackService extends AbstractComponent {
     @Inject
     RatpackService(Settings settings, Client client) {
         super(settings)
-        LaunchConfig launchConfig = LaunchConfigBuilder
-                .noBaseDir()
-                .port(settings.getAsInt("ratpack.port", 5050))
-                .build {
-            chain(it) {
+        GroovyEmbeddedApp.build {
+            baseDir {
+                BaseDirBuilder.tmpDir().build {
+                    it.file "public/foo.txt", "bar"
+                }
+            }
+
+            launchConfig {
+                development true
+                port settings.getAsInt("ratpack.port", 5050)
+                other "some.other.property": "value"
+            }
+
+            // Configure the module registry
+            bindings {
+                add new JacksonModule()
+            }
+
+            // Use the GroovyChain DSL for defining the application handlers
+            handlers {
                 get {
                     NodesInfoResponse response = client.admin().cluster().nodesInfo(new NodesInfoRequest()).actionGet()
                     render "Hello, here is Ratpack with the Elasticsearch nodes info: " + response
                 }
+                assets "public"
             }
         }
-        RatpackServerBuilder.build(launchConfig).start()
+        .server.start()
     }
 }

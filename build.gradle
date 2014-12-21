@@ -3,7 +3,7 @@ apply plugin: 'application'
 apply plugin: 'maven'
 
 group = 'org.xbib.elasticsearch.plugin'
-version = '1.4.0.0'
+version = '1.4.0.1'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
@@ -22,11 +22,13 @@ configurations {
 dependencies {
     compile 'io.ratpack:ratpack-core:0.9.11'
     compile 'io.ratpack:ratpack-groovy:0.9.11'
+    compile 'io.ratpack:ratpack-jackson:0.9.11'
     providedCompile 'org.elasticsearch:elasticsearch:1.4.0'
     testCompile 'junit:junit:4.11'
     releaseJars group: 'io.ratpack', name: 'ratpack-core', version: '0.9.11'
     releaseJars group: 'io.ratpack', name: 'ratpack-groovy', version: '0.9.11'
     releaseJars group: 'io.ratpack', name: 'ratpack-guice', version: '0.9.11'
+    releaseJars group: 'io.ratpack', name: 'ratpack-jackson', version: '0.9.11'
     releaseJars group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.5'
     wagon 'org.apache.maven.wagon:wagon-ssh-external:2.6'
 }
